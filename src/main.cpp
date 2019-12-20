@@ -63,23 +63,22 @@ GButton butt_rht(BUTT_PIN_RHT);
 
 void setup()
 {
-    int i;
     u8g2.begin();
     u8g2.clearBuffer();
-
+    // git test 1
     u8g2.sendBuffer();
 
+    // git test 2
     // Устанавливаем цвет отрисовки по умолчанию (белый на чёрном)
     u8g2.setDrawColor(1);
 
-    u8g2.drawFrame(0, 0, 96, 64); // Рамка икрового поля (2 пикселя)
-    u8g2.drawFrame(1, 1, 94, 62); // *
+    // u8g2.drawFrame(0, 0, 96, 64); // Рамка икрового поля (2 пикселя)
+    // u8g2.drawFrame(1, 1, 95, 62); // *
 
-    butt_up.setDebounce(1);
+    butt_up.setDebounce(1);         // git test 3
     butt_dwn.setDebounce(1);
     butt_let.setDebounce(1);
     butt_rht.setDebounce(1);
-
     butt_dwn.setClickTimeout(50);
     butt_up.setClickTimeout(50);
     butt_let.setClickTimeout(50);
@@ -97,16 +96,15 @@ void loop()
 
         // FIXME: hjkhkjhkjk
         u8g2.setDrawColor(0);
-        u8g2.drawBox(0, 0, 127, 63);
+        u8g2.drawBox(0, 0, 128, 64);
         u8g2.setDrawColor(1);
         u8g2.setFont(u8g2_font_7x14B_mf);
         u8g2.setFontDirection(0);
-        u8g2.drawStr(10, 10, "press up to start");
-        u8g2.drawStr(10, 30, "good luck");
+        u8g2.drawStr(5, 10, "press up to start");
+        u8g2.drawStr(5, 30, "good luck");
         // FIXME: fkjskjf k hk kj kkjh khkhk
         u8g2.sendBuffer();
-        Serial.println("state 0");
-        //state= 1;
+        state= 1;
         break;
         
     case 1:
@@ -119,7 +117,6 @@ void loop()
         {
             state = 2;
         }
-        Serial.println("key pressed");
         break;
 
     case 2:
