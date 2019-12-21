@@ -33,6 +33,7 @@
 #define SNAKE_START_LENGTH 7
 
 int score = 0;
+int score_max;
 
 void figShw(u8g2_uint_t x, u8g2_uint_t y);
 void figClr(u8g2_uint_t x, u8g2_uint_t y);
@@ -84,6 +85,9 @@ void setup()
     butt_let.setClickTimeout(50);
     butt_rht.setClickTimeout(50);
     Serial.begin(9600);
+
+    //#
+    // score_max inicializacija
 }
 
 void loop()
@@ -139,6 +143,13 @@ void loop()
         u8g2.setDrawColor(0);
         u8g2.drawStr(100, 32, "   ");
         u8g2.setDrawColor(1);
+
+        /*# vivodim max rezultat
+            sprintf(scoreStr, "%d", score);
+            u8g2.setDrawColor(0);
+            u8g2.drawStr(100, 32, scoreStr);
+            u8g2.setDrawColor(1);
+        */
         // TODO: 3
         // zapolnjaem zmeju:
         snake[0][0] = 0; // 1. hvost
@@ -219,6 +230,9 @@ void loop()
         u8g2.setDrawColor(1);
         u8g2.setFont(u8g2_font_7x14B_mf);
         u8g2.setFontDirection(0);
+
+//# fixiruem maximalnij resultat
+
         u8g2.drawStr(15, 15, "Game over!");
         u8g2.drawStr(15, 35, "  press");
         u8g2.drawStr(15, 55, "   DWN");
