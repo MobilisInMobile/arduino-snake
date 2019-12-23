@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
+// #include <avr/eeprom.h>
 
 #ifdef U8X8_HAVE_HW_SPI
 #include <SPI.h>
@@ -33,7 +34,7 @@
 #define SNAKE_START_LENGTH 7
 
 int score = 0;
-int score_max;
+byte score_max;
 
 void figShw(u8g2_uint_t x, u8g2_uint_t y);
 void figClr(u8g2_uint_t x, u8g2_uint_t y);
@@ -52,6 +53,7 @@ int direction = RHT;
 int snakeHead;
 unsigned long last_time;
 int state = 0;
+char scoreStr[3];
 
 u8g2_uint_t cookie_x;
 u8g2_uint_t cookie_y;
@@ -64,6 +66,7 @@ GButton butt_rht(BUTT_PIN_RHT);
 
 void setup()
 {
+    // eeprom_write_byte(0, 2);
     u8g2.begin();
     u8g2.clearBuffer();
     // git test 1
@@ -76,7 +79,7 @@ void setup()
     // u8g2.drawFrame(0, 0, 96, 64); // Рамка икрового поля (2 пикселя)
     // u8g2.drawFrame(1, 1, 95, 62); // *
 
-    butt_up.setDebounce(1);         // git test 3
+    butt_up.setDebounce(1); // git test 3
     butt_dwn.setDebounce(1);
     butt_let.setDebounce(1);
     butt_rht.setDebounce(1);
@@ -86,8 +89,18 @@ void setup()
     butt_rht.setClickTimeout(50);
     Serial.begin(9600);
 
-    //#
-    // score_max inicializacija
+    score_max = eeprom_read_byte(0);
+
+    //if (score_max = 255)
+    //    score_max = 0;
+
+    /* 4 delete
+    u8g2.setDrawColor(0);
+        u8g2.drawBox(3, 3, 93, 61);
+        u8g2.setDrawColor(1);
+        u8g2.setFont(u8g2_font_7x14B_mf);
+        u8g2.setFontDirection(0);
+    */
 }
 
 void loop()
@@ -108,21 +121,22 @@ void loop()
         u8g2.drawStr(5, 30, "good luck");
         // FIXME: fkjskjf k hk kj kkjh khkhk
         u8g2.sendBuffer();
-        state= 1;
+        state = 1;
         break;
-        
+
     case 1:
         butt_up.tick();  // обязательная функция отработки. Должна постоянно опрашиваться
         butt_dwn.tick(); // обязательная функция отработки. Должна постоянно опрашиваться
         butt_let.tick(); // обязательная функция отработки. Должна постоянно опрашиваться
         butt_rht.tick(); // обязательная функция отработки. Должна постоянно опрашиваться
-        
+
         if (butt_up.isSingle() || butt_up.isDouble() || butt_up.isHolded() || butt_up.isHold())
         {
             state = 2;
         }
         break;
 
+        
     case 2:
         snakeHead = SNAKE_START_LENGTH - 1;
         direction = RHT;
@@ -141,15 +155,14 @@ void loop()
 
         // u8g2.setFontMode(1);
         u8g2.setDrawColor(0);
-        u8g2.drawStr(100, 32, "   ");
+        u8g2.drawStr(100, 32, " ");
         u8g2.setDrawColor(1);
 
-        /*# vivodim max rezultat
-            sprintf(scoreStr, "%d", score);
-            u8g2.setDrawColor(0);
-            u8g2.drawStr(100, 32, scoreStr);
-            u8g2.setDrawColor(1);
-        */
+        sprintf(scoreStr, "%d", score_max);
+        u8g2.setDrawColor(0);
+        u8g2.drawStr(100, 48, scoreStr);
+        u8g2.setDrawColor(1);
+
         // TODO: 3
         // zapolnjaem zmeju:
         snake[0][0] = 0; // 1. hvost
@@ -231,16 +244,19 @@ void loop()
         u8g2.setFont(u8g2_font_7x14B_mf);
         u8g2.setFontDirection(0);
 
-//# fixiruem maximalnij resultat
+        //# fixiruem maximalnij resultat
 
         u8g2.drawStr(15, 15, "Game over!");
         u8g2.drawStr(15, 35, "  press");
         u8g2.drawStr(15, 55, "   DWN");
 
+        if (score > (int) score_max) {
+            score_max = score;
+            eeprom_write_byte(0, (byte) score); // 1 байт
+        }
         state = 5;
         break;
     case 5:
-    
 
         butt_up.tick();  // обязательная функция отработки. Должна постоянно опрашиваться
         butt_dwn.tick(); // обязательная функция отработки. Должна постоянно опрашиваться
@@ -306,7 +322,7 @@ void figNextPos(u8g2_uint_t x1, u8g2_uint_t y1, u8g2_uint_t *x2, u8g2_uint_t *y2
 
 boolean snakeMove(int direction)
 {
-    char scoreStr[3];
+    
     u8g2_uint_t x2, y2;
     figNextPos(snake[snakeHead][0], snake[snakeHead][1], &x2, &y2, direction);
     if (((x2 == snake[snakeHead - 1][0]) && (y2 == snake[snakeHead - 1][1])) || ((x2 == snake[snakeHead][0]) && (y2 == snake[snakeHead][1])))
